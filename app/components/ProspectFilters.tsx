@@ -12,24 +12,24 @@ interface ProspectFiltersProps {
 
 export function ProspectFilters({ onFilterChange }: ProspectFiltersProps) {
   const [search, setSearch] = useState('');
-  const [ville, setVille] = useState('');
-  const [statut, setStatut] = useState('');
-  const [priorite, setPriorite] = useState('');
+  const [ville, setVille] = useState('all');
+  const [statut, setStatut] = useState('all');
+  const [priorite, setPriorite] = useState('all');
 
   const handleSearch = () => {
     onFilterChange({
       search,
-      ville,
-      statut,
-      priorite,
+      ville: ville === 'all' ? '' : ville,
+      statut: statut === 'all' ? '' : statut,
+      priorite: priorite === 'all' ? '' : priorite,
     });
   };
 
   const handleReset = () => {
     setSearch('');
-    setVille('');
-    setStatut('');
-    setPriorite('');
+    setVille('all');
+    setStatut('all');
+    setPriorite('all');
     onFilterChange({});
   };
 
@@ -50,7 +50,7 @@ export function ProspectFilters({ onFilterChange }: ProspectFiltersProps) {
               <SelectValue placeholder="Ville" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Toutes</SelectItem>
+              <SelectItem value="all">Toutes</SelectItem>
               <SelectItem value="Paris">Paris</SelectItem>
               <SelectItem value="Lyon">Lyon</SelectItem>
               <SelectItem value="Toulouse">Toulouse</SelectItem>
@@ -64,7 +64,7 @@ export function ProspectFilters({ onFilterChange }: ProspectFiltersProps) {
               <SelectValue placeholder="Statut" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Tous</SelectItem>
+              <SelectItem value="all">Tous</SelectItem>
               <SelectItem value="À contacter">À contacter</SelectItem>
               <SelectItem value="Envoyé">Envoyé</SelectItem>
               <SelectItem value="Répondu">Répondu</SelectItem>
@@ -78,7 +78,7 @@ export function ProspectFilters({ onFilterChange }: ProspectFiltersProps) {
               <SelectValue placeholder="Priorité" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Toutes</SelectItem>
+              <SelectItem value="all">Toutes</SelectItem>
               <SelectItem value="Haute">Haute</SelectItem>
               <SelectItem value="Moyenne">Moyenne</SelectItem>
               <SelectItem value="Basse">Basse</SelectItem>
