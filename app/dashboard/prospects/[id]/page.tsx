@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { Prospect } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -24,9 +24,10 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 
-export default function ProspectDetailPage({ params }: { params: { id: string } }) {
-  // Unwrap params if it's a Promise (Next.js 15)
-  const id = React.use(params).id;
+export default function ProspectDetailPage() {
+  // Utiliser useParams pour récupérer l'ID depuis l'URL
+  const params = useParams();
+  const id = params?.id as string;
   const router = useRouter();
   const [prospect, setProspect] = useState<Prospect | null>(null);
   const [loading, setLoading] = useState(true);
