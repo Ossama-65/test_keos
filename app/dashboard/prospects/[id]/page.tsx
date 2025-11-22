@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Prospect } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -25,6 +25,8 @@ import {
 import Link from 'next/link';
 
 export default function ProspectDetailPage({ params }: { params: { id: string } }) {
+  // Unwrap params if it's a Promise (Next.js 15)
+  const id = React.use(params).id;
   const router = useRouter();
   const [prospect, setProspect] = useState<Prospect | null>(null);
   const [loading, setLoading] = useState(true);
@@ -34,12 +36,12 @@ export default function ProspectDetailPage({ params }: { params: { id: string } 
 
   useEffect(() => {
     fetchProspect();
-  }, [params.id]);
+  }, [id]);
 
   const fetchProspect = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`/api/prospects?id=${params.id}`);
+      const response = await fetch(`/api/prospects?id=${id}`);
       if (!response.ok) throw new Error('Failed to fetch');
       const data = await response.json();
       setProspect(data);
@@ -54,7 +56,7 @@ export default function ProspectDetailPage({ params }: { params: { id: string } 
   const handleSave = async () => {
     setSaving(true);
     try {
-      const response = await fetch(`/api/prospects?id=${params.id}`, {
+      const response = await fetch(`/api/prospects?id=${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
