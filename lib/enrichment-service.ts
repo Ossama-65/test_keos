@@ -34,10 +34,13 @@ export class ProspectEnricher {
 
       console.log(`📊 ${prospects.length} prospects chargés`);
 
+      // Limiter à 20 prospects maximum pour éviter le timeout sur Vercel
+      const maxProspects = Math.min(prospects.length, 20);
+      
       // Enrichir chaque prospect
-      for (let i = 0; i < prospects.length; i++) {
+      for (let i = 0; i < maxProspects; i++) {
         const prospect = prospects[i];
-        console.log(`🔎 [${i + 1}/${prospects.length}] ${prospect.nom_entreprise}...`);
+        console.log(`🔎 [${i + 1}/${maxProspects}] ${prospect.nom_entreprise}...`);
 
         let wasEnriched = false;
 
@@ -66,18 +69,30 @@ export class ProspectEnricher {
         }
 
         // Pause pour éviter le rate limiting (plus court pour production)
-        await this.sleep(500);
+        await this.sleep(300);
       }
 
-      // Sauvegarder les prospects enrichis
-      await fs.writeFile(prospectsPath, JSON.stringify(prospects, null, 2), 'utf-8');
-      console.log(`💾 Fichier sauvegardé avec ${enrichedCount} prospects enrichis`);
+      // Sur Vercel, on ne peut pas écrire dans le filesystem en production
+      // On essaie quand même en développement
+      if (process.env.NODE_ENV !== 'production') {
+        try {
+          await fs.writeFile(prospectsPath, JSON.stringify(prospects, null, 2), 'utf-8');
+          console.log(`💾 Fichier sauvegardé avec ${enrichedCount} prospects enrichis`);
+        } catch (writeError) {
+          console.warn('⚠️ Impossible de sauvegarder le fichier (normal en production sur Vercel)');
+        }
+      } else {
+        console.log(`ℹ️ Mode production: ${enrichedCount} prospects enrichis (stockage temporaire)`);
+        console.log(`💡 Pour sauvegarder de manière persistante, utilisez une base de données comme Vercel Postgres ou MongoDB`);
+      }
 
       return {
         success: true,
         enrichedCount,
         errors,
-        message: `${enrichedCount} prospects enrichis avec succès !`,
+        message: enrichedCount > 0 
+          ? `${enrichedCount} prospects enrichis avec succès ! (sur ${maxProspects} traités)` 
+          : `Aucun prospect nécessitant un enrichissement parmi les ${maxProspects} premiers.`,
       };
     } catch (error: any) {
       console.error('Erreur lors de l\'enrichissement:', error);
