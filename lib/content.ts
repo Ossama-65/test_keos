@@ -1,7 +1,4 @@
-import { promises as fs } from 'fs';
-import path from 'path';
-
-const CONTENT_FILE = path.join(process.cwd(), 'public', 'data', 'content.json');
+import { getAllContent } from './content-service';
 
 export interface SiteContent {
   name: string;
@@ -87,51 +84,52 @@ export interface ContentData {
   meta: MetaContent;
 }
 
+// Valeurs par défaut
+const defaultContent: ContentData = {
+  site: {
+    name: 'URBANSTYLE',
+    tagline: 'STYLE',
+    description: '',
+    email: '',
+    phone: '',
+    address: '',
+    city: '',
+    whatsapp: '',
+    copyright: ''
+  },
+  hero: {
+    badge: '',
+    title: '',
+    titleAccent: '',
+    description: '',
+    ctaText: '',
+    ctaSecondary: '',
+    backgroundImage: ''
+  },
+  advantages: [],
+  bestsellers: { title: '', description: '', products: [] },
+  products: [],
+  contact: {
+    title: '',
+    subtitle: '',
+    email: '',
+    emailSupport: '',
+    phone: '',
+    phoneHours: '',
+    hours: { weekdays: '', saturday: '', sunday: '' },
+    address: '',
+    city: ''
+  },
+  productsPage: { title: '', description: '' },
+  meta: { title: '', description: '', keywords: '' }
+};
+
 export async function getContent(): Promise<ContentData> {
   try {
-    const content = await fs.readFile(CONTENT_FILE, 'utf-8');
-    return JSON.parse(content);
+    const content = await getAllContent();
+    return content as ContentData;
   } catch (error) {
     console.error('Error reading content:', error);
-    // Retourner des valeurs par défaut en cas d'erreur
-    return {
-      site: {
-        name: 'URBANSTYLE',
-        tagline: 'STYLE',
-        description: '',
-        email: '',
-        phone: '',
-        address: '',
-        city: '',
-        whatsapp: '',
-        copyright: ''
-      },
-      hero: {
-        badge: '',
-        title: '',
-        titleAccent: '',
-        description: '',
-        ctaText: '',
-        ctaSecondary: '',
-        backgroundImage: ''
-      },
-      advantages: [],
-      bestsellers: { title: '', description: '', products: [] },
-      products: [],
-      contact: {
-        title: '',
-        subtitle: '',
-        email: '',
-        emailSupport: '',
-        phone: '',
-        phoneHours: '',
-        hours: { weekdays: '', saturday: '', sunday: '' },
-        address: '',
-        city: ''
-      },
-      productsPage: { title: '', description: '' },
-      meta: { title: '', description: '', keywords: '' }
-    };
+    return defaultContent;
   }
 }
-
