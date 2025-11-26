@@ -10,7 +10,10 @@ import {
   ArrowRight,
   Image as ImageIcon,
   Phone,
-  RefreshCw
+  RefreshCw,
+  Database,
+  CheckCircle,
+  AlertCircle
 } from 'lucide-react';
 
 interface ContentData {
@@ -23,6 +26,7 @@ interface ContentData {
 export default function AdminDashboard() {
   const [content, setContent] = useState<ContentData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [initStatus, setInitStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
 
   const fetchContent = async () => {
     setLoading(true);
@@ -34,6 +38,24 @@ export default function AdminDashboard() {
       console.error('Error fetching content:', error);
     }
     setLoading(false);
+  };
+
+  const initDatabase = async () => {
+    setInitStatus('loading');
+    try {
+      const res = await fetch('/api/content/init', { method: 'POST' });
+      const data = await res.json();
+      if (data.success) {
+        setInitStatus('success');
+        fetchContent();
+        setTimeout(() => setInitStatus('idle'), 3000);
+      } else {
+        setInitStatus('error');
+      }
+    } catch (error) {
+      console.error('Error initializing database:', error);
+      setInitStatus('error');
+    }
   };
 
   useEffect(() => {
@@ -135,6 +157,43 @@ export default function AdminDashboard() {
               <ArrowRight className="w-5 h-5 text-slate-600 group-hover:text-amber-500 group-hover:translate-x-1 transition-all flex-shrink-0" />
             </Link>
           ))}
+        </div>
+      </div>
+
+      {/* Database Init */}
+      <div className="mt-8 bg-slate-800/50 border border-slate-700 rounded-2xl p-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-xl font-semibold text-white flex items-center gap-2">
+              <Database className="w-5 h-5 text-amber-500" />
+              Base de données
+            </h2>
+            <p className="text-slate-400 text-sm mt-1">
+              Initialisez ou réinitialisez la base de données avec les données par défaut
+            </p>
+          </div>
+          <button
+            onClick={initDatabase}
+            disabled={initStatus === 'loading'}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all ${
+              initStatus === 'success'
+                ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                : initStatus === 'error'
+                ? 'bg-red-500/20 text-red-400 border border-red-500/30'
+                : 'bg-amber-500/20 text-amber-400 border border-amber-500/30 hover:bg-amber-500/30'
+            }`}
+          >
+            {initStatus === 'loading' ? (
+              <RefreshCw className="w-4 h-4 animate-spin" />
+            ) : initStatus === 'success' ? (
+              <CheckCircle className="w-4 h-4" />
+            ) : initStatus === 'error' ? (
+              <AlertCircle className="w-4 h-4" />
+            ) : (
+              <Database className="w-4 h-4" />
+            )}
+            {initStatus === 'success' ? 'Initialisé !' : initStatus === 'error' ? 'Erreur' : 'Initialiser DB'}
+          </button>
         </div>
       </div>
 

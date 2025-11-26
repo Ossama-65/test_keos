@@ -1,4 +1,4 @@
-import { getAllContent } from './content-service';
+import { getSiteContent } from './mongodb';
 
 export interface SiteContent {
   name: string;
@@ -84,33 +84,33 @@ export interface ContentData {
   meta: MetaContent;
 }
 
-// Valeurs par défaut
+// Données par défaut en cas d'erreur
 const defaultContent: ContentData = {
   site: {
     name: 'URBANSTYLE',
     tagline: 'STYLE',
-    description: '',
-    email: '',
-    phone: '',
-    address: '',
-    city: '',
-    whatsapp: '',
-    copyright: ''
+    description: 'Votre destination mode pour des vêtements de qualité.',
+    email: 'contact@urbanstyle.fr',
+    phone: '01 23 45 67 89',
+    address: '123 Avenue de la Mode',
+    city: '75001 Paris, France',
+    whatsapp: '33123456789',
+    copyright: '© 2024 UrbanStyle. Tous droits réservés.'
   },
   hero: {
-    badge: '',
-    title: '',
-    titleAccent: '',
-    description: '',
-    ctaText: '',
-    ctaSecondary: '',
-    backgroundImage: ''
+    badge: 'Nouvelle Collection 2024',
+    title: 'Style Urbain',
+    titleAccent: 'Qualité Premium',
+    description: 'Découvrez notre collection exclusive de t-shirts et jeans.',
+    ctaText: 'Voir les Produits',
+    ctaSecondary: 'Nous Contacter',
+    backgroundImage: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1920&q=80'
   },
   advantages: [],
-  bestsellers: { title: '', description: '', products: [] },
+  bestsellers: { title: 'Nos Bestsellers', description: '', products: [] },
   products: [],
   contact: {
-    title: '',
+    title: 'Contactez-nous',
     subtitle: '',
     email: '',
     emailSupport: '',
@@ -120,16 +120,19 @@ const defaultContent: ContentData = {
     address: '',
     city: ''
   },
-  productsPage: { title: '', description: '' },
+  productsPage: { title: 'Nos Produits', description: '' },
   meta: { title: '', description: '', keywords: '' }
 };
 
 export async function getContent(): Promise<ContentData> {
   try {
-    const content = await getAllContent();
-    return content as ContentData;
+    const content = await getSiteContent();
+    if (content) {
+      return content as ContentData;
+    }
+    return defaultContent;
   } catch (error) {
-    console.error('Error reading content:', error);
+    console.error('Error reading content from MongoDB:', error);
     return defaultContent;
   }
 }

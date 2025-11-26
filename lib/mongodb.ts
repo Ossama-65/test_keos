@@ -1,56 +1,72 @@
-import mongoose from 'mongoose';
+import { MongoClient, Db } from 'mongodb';
 
-const MONGODB_URI = process.env.MONGODB_URI || '';
-
-if (!MONGODB_URI) {
-  console.warn('⚠️ MONGODB_URI non défini - utilisation du mode fichier JSON');
+if (!process.env.MONGODB_URI) {
+  throw new Error('Veuillez définir la variable d\'environnement MONGODB_URI');
 }
 
-interface MongooseCache {
-  conn: typeof mongoose | null;
-  promise: Promise<typeof mongoose> | null;
-}
+const uri = process.env.MONGODB_URI;
+const options = {};
 
-declare global {
-  // eslint-disable-next-line no-var
-  var mongoose: MongooseCache | undefined;
-}
+let client: MongoClient;
+let clientPromise: Promise<MongoClient>;
 
-const cached: MongooseCache = global.mongoose || { conn: null, promise: null };
+if (process.env.NODE_ENV === 'development') {
+  // En développement, utiliser une variable globale pour préserver la connexion
+  const globalWithMongo = global as typeof globalThis & {
+    _mongoClientPromise?: Promise<MongoClient>;
+  };
 
-if (!global.mongoose) {
-  global.mongoose = cached;
-}
-
-export async function connectToDatabase() {
-  if (!MONGODB_URI) {
-    return null;
+  if (!globalWithMongo._mongoClientPromise) {
+    client = new MongoClient(uri, options);
+    globalWithMongo._mongoClientPromise = client.connect();
   }
-
-  if (cached.conn) {
-    return cached.conn;
-  }
-
-  if (!cached.promise) {
-    const opts = {
-      bufferCommands: false,
-    };
-
-    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
-      console.log('✅ Connecté à MongoDB');
-      return mongoose;
-    });
-  }
-
-  try {
-    cached.conn = await cached.promise;
-  } catch (e) {
-    cached.promise = null;
-    throw e;
-  }
-
-  return cached.conn;
+  clientPromise = globalWithMongo._mongoClientPromise;
+} else {
+  // En production, créer une nouvelle connexion
+  client = new MongoClient(uri, options);
+  clientPromise = client.connect();
 }
 
-export default connectToDatabase;
+export default clientPromise;
 
+export async function getDatabase(): Promise<Db> {
+  const client = await clientPromise;
+  return client.db('urbanstyle');
+}
+
+// Fonction pour récupérer le contenu du site
+export async function getSiteContent() {
+  const db = await getDatabase();
+  const content = await db.collection('content').findOne({ _id: 'site_content' as any });
+  return content?.data || null;
+}
+
+// Fonction pour mettre à jour le contenu du site
+export async function updateSiteContent(data: any) {
+  const db = await getDatabase();
+  await db.collection('content').updateOne(
+    { _id: 'site_content' as any },
+    { $set: { data, updatedAt: new Date() } },
+    { upsert: true }
+  );
+  return data;
+}
+
+// Fonction pour mettre à jour une section spécifique
+export async function updateSection(section: string, sectionData: any) {
+  const db = await getDatabase();
+  const updatePath = `data.${section}`;
+  await db.collection('content').updateOne(
+    { _id: 'site_content' as any },
+    { 
+      $set: { 
+        [updatePath]: sectionData, 
+        updatedAt: new Date() 
+      } 
+    },
+    { upsert: true }
+  );
+  
+  // Retourner le contenu mis à jour
+  return getSiteContent();
+}

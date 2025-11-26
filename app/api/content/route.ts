@@ -1,14 +1,39 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAllContent, updateContent, patchContent } from '@/lib/content-service';
+import { getSiteContent, updateSiteContent, updateSection } from '@/lib/mongodb';
+import { promises as fs } from 'fs';
+import path from 'path';
+
+// Données par défaut (utilisées pour l'initialisation)
+const getDefaultContent = async () => {
+  try {
+    const filePath = path.join(process.cwd(), 'public', 'data', 'content.json');
+    const content = await fs.readFile(filePath, 'utf-8');
+    return JSON.parse(content);
+  } catch {
+    return null;
+  }
+};
 
 // GET - Récupérer tout le contenu
 export async function GET() {
   try {
-    const content = await getAllContent();
-    return NextResponse.json(content);
+    let content = await getSiteContent();
+    
+    // Si pas de contenu en base, initialiser avec les données par défaut
+    if (!content) {
+      const defaultContent = await getDefaultContent();
+      if (defaultContent) {
+        await updateSiteContent(defaultContent);
+        content = defaultContent;
+      }
+    }
+    
+    return NextResponse.json(content || {});
   } catch (error) {
     console.error('Error reading content:', error);
-    return NextResponse.json({ error: 'Erreur lecture contenu' }, { status: 500 });
+    // Fallback vers le fichier JSON en cas d'erreur DB
+    const defaultContent = await getDefaultContent();
+    return NextResponse.json(defaultContent || { error: 'Erreur lecture contenu' });
   }
 }
 
@@ -18,7 +43,17 @@ export async function PUT(request: NextRequest) {
     const body = await request.json();
     const { section, data } = body;
     
-    const updatedContent = await updateContent(section, data);
+    let updatedContent;
+    
+    if (section) {
+      // Mise à jour d'une section spécifique
+      updatedContent = await updateSection(section, data);
+    } else {
+      // Mise à jour complète
+      const currentContent = await getSiteContent() || {};
+      const newContent = { ...currentContent, ...data };
+      updatedContent = await updateSiteContent(newContent);
+    }
     
     return NextResponse.json({ success: true, data: updatedContent });
   } catch (error) {
@@ -37,7 +72,14 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: 'Section et field requis' }, { status: 400 });
     }
     
-    const updatedContent = await patchContent(section, field, value);
+    const currentContent = await getSiteContent() || {};
+    
+    if (!currentContent[section]) {
+      currentContent[section] = {};
+    }
+    currentContent[section][field] = value;
+    
+    const updatedContent = await updateSiteContent(currentContent);
     
     return NextResponse.json({ success: true, data: updatedContent });
   } catch (error) {
