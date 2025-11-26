@@ -1,34 +1,68 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { ShoppingBag, Filter, X } from 'lucide-react';
+import { ShoppingBag, Filter, X, Loader2 } from 'lucide-react';
 import WhatsAppChatbot from '../components/WhatsAppChatbot';
 
-const products = [
-  // T-Shirts
-  { id: 1, name: 'T-Shirt Premium Noir', price: 29.99, category: 'tshirt', size: ['S', 'M', 'L', 'XL'], img: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&q=80', color: 'Noir' },
-  { id: 2, name: 'T-Shirt Blanc Essential', price: 24.99, category: 'tshirt', size: ['S', 'M', 'L', 'XL', 'XXL'], img: 'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=400&q=80', color: 'Blanc' },
-  { id: 3, name: 'T-Shirt Gris Chiné', price: 27.99, category: 'tshirt', size: ['M', 'L', 'XL'], img: 'https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=400&q=80', color: 'Gris' },
-  { id: 4, name: 'T-Shirt Navy Blue', price: 29.99, category: 'tshirt', size: ['S', 'M', 'L'], img: 'https://images.unsplash.com/photo-1562157873-818bc0726f68?w=400&q=80', color: 'Bleu Marine' },
-  { id: 5, name: 'T-Shirt Oversize Beige', price: 34.99, category: 'tshirt', size: ['M', 'L', 'XL'], img: 'https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=400&q=80', color: 'Beige' },
-  { id: 6, name: 'T-Shirt Col V Noir', price: 26.99, category: 'tshirt', size: ['S', 'M', 'L', 'XL'], img: 'https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=400&q=80', color: 'Noir' },
-  // Jeans
-  { id: 7, name: 'Jean Slim Classic', price: 59.99, category: 'jean', size: ['28', '30', '32', '34', '36'], img: 'https://images.unsplash.com/photo-1542272604-787c3835535d?w=400&q=80', color: 'Bleu Foncé' },
-  { id: 8, name: 'Jean Regular Vintage', price: 69.99, category: 'jean', size: ['30', '32', '34', '36'], img: 'https://images.unsplash.com/photo-1604176354204-9268737828e4?w=400&q=80', color: 'Bleu Délavé' },
-  { id: 9, name: 'Jean Noir Stretch', price: 64.99, category: 'jean', size: ['28', '30', '32', '34'], img: 'https://images.unsplash.com/photo-1582552938357-32b906df40cb?w=400&q=80', color: 'Noir' },
-  { id: 10, name: 'Jean Droit Indigo', price: 74.99, category: 'jean', size: ['30', '32', '34', '36', '38'], img: 'https://images.unsplash.com/photo-1475178626620-a4d074967452?w=400&q=80', color: 'Indigo' },
-  { id: 11, name: 'Jean Skinny Gris', price: 54.99, category: 'jean', size: ['28', '30', '32'], img: 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=400&q=80', color: 'Gris' },
-  { id: 12, name: 'Jean Baggy Light Blue', price: 79.99, category: 'jean', size: ['30', '32', '34', '36'], img: 'https://images.unsplash.com/photo-1598554747436-c9293d6a588f?w=400&q=80', color: 'Bleu Clair' },
-];
+interface Product {
+  id: string;
+  name: string;
+  price: number;
+  category: 'tshirt' | 'jean';
+  sizes: string[];
+  image: string;
+  color: string;
+  active: boolean;
+}
+
+interface ContentData {
+  products: Product[];
+  productsPage: {
+    title: string;
+    description: string;
+  };
+  site: {
+    name: string;
+    tagline: string;
+    copyright: string;
+  };
+}
 
 export default function ProductsPage() {
+  const [content, setContent] = useState<ContentData | null>(null);
+  const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'tshirt' | 'jean'>('all');
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
 
+  useEffect(() => {
+    fetchContent();
+  }, []);
+
+  const fetchContent = async () => {
+    try {
+      const res = await fetch('/api/content');
+      const data = await res.json();
+      setContent(data);
+    } catch (error) {
+      console.error('Error fetching content:', error);
+    }
+    setLoading(false);
+  };
+
+  if (loading || !content) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-[var(--accent)] animate-spin" />
+      </div>
+    );
+  }
+
+  const { products, productsPage, site } = content;
+  const activeProducts = products.filter(p => p.active);
   const filteredProducts = filter === 'all' 
-    ? products 
-    : products.filter(p => p.category === filter);
+    ? activeProducts 
+    : activeProducts.filter(p => p.category === filter);
 
   return (
     <main className="min-h-screen bg-[var(--background)]">
@@ -37,7 +71,7 @@ export default function ProductsPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 sm:h-20">
             <Link href="/" className="text-2xl sm:text-3xl font-bold tracking-tight" style={{ fontFamily: "'Playfair Display', serif" }}>
-              URBAN<span className="text-[var(--accent)]">STYLE</span>
+              {site.name.replace(site.tagline, '')}<span className="text-[var(--accent)]">{site.tagline}</span>
             </Link>
             <div className="hidden md:flex items-center gap-8">
               <Link href="/" className="text-sm font-medium hover:text-[var(--accent)] transition-colors">Accueil</Link>
@@ -56,10 +90,10 @@ export default function ProductsPage() {
       <section className="pt-32 pb-12 bg-[var(--muted)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-4xl sm:text-5xl font-bold mb-4" style={{ fontFamily: "'Playfair Display', serif" }}>
-            Nos Produits
+            {productsPage.title}
           </h1>
           <p className="text-[var(--muted-foreground)] text-lg max-w-2xl">
-            Découvrez notre collection de t-shirts et jeans de qualité premium.
+            {productsPage.description}
           </p>
         </div>
       </section>
@@ -150,7 +184,7 @@ export default function ProductsPage() {
               >
                 <div className="aspect-[3/4] overflow-hidden relative">
                   <img 
-                    src={product.img} 
+                    src={product.image} 
                     alt={product.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
@@ -172,7 +206,7 @@ export default function ProductsPage() {
                     <span className="text-xs text-[var(--muted-foreground)]">{product.color}</span>
                   </div>
                   <div className="flex flex-wrap gap-1 mt-3">
-                    {product.size.map(size => (
+                    {product.sizes.map(size => (
                       <span key={size} className="text-xs px-2 py-1 bg-[var(--muted)] text-[var(--muted-foreground)]">
                         {size}
                       </span>
@@ -193,9 +227,9 @@ export default function ProductsPage() {
       <footer className="bg-[var(--primary)] text-white py-12 mt-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <p className="text-xl font-bold mb-2" style={{ fontFamily: "'Playfair Display', serif" }}>
-            URBAN<span className="text-[var(--accent)]">STYLE</span>
+            {site.name.replace(site.tagline, '')}<span className="text-[var(--accent)]">{site.tagline}</span>
           </p>
-          <p className="text-white/50 text-sm">© 2024 UrbanStyle. Tous droits réservés.</p>
+          <p className="text-white/50 text-sm">{site.copyright}</p>
         </div>
       </footer>
 
@@ -203,4 +237,3 @@ export default function ProductsPage() {
     </main>
   );
 }
-

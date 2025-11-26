@@ -3,9 +3,6 @@
 import { useState, useEffect } from 'react';
 import { MessageCircle, X, Send, Clock } from 'lucide-react';
 
-// Remplacez par votre numéro WhatsApp Business
-const WHATSAPP_NUMBER = '33123456789'; // Format international sans le +
-
 const FAQ_RESPONSES = [
   { question: 'Livraison', answer: 'Livraison en 24-48h en France métropolitaine. Frais offerts dès 50€ d\'achat !' },
   { question: 'Retours', answer: 'Retours gratuits sous 30 jours. Renvoyez simplement le produit dans son emballage d\'origine.' },
@@ -20,6 +17,27 @@ export default function WhatsAppChatbot() {
     { type: 'bot', text: 'Bonjour ! 👋 Comment puis-je vous aider aujourd\'hui ?' }
   ]);
   const [isBusinessHours, setIsBusinessHours] = useState(false);
+  const [whatsappNumber, setWhatsappNumber] = useState('33123456789');
+  const [siteName, setSiteName] = useState('UrbanStyle');
+
+  // Récupérer les données du site
+  useEffect(() => {
+    const fetchSiteData = async () => {
+      try {
+        const res = await fetch('/api/content');
+        const data = await res.json();
+        if (data.site?.whatsapp) {
+          setWhatsappNumber(data.site.whatsapp);
+        }
+        if (data.site?.name) {
+          setSiteName(data.site.name);
+        }
+      } catch (error) {
+        console.error('Error fetching site data:', error);
+      }
+    };
+    fetchSiteData();
+  }, []);
 
   // Vérifie si on est dans les horaires d'ouverture
   useEffect(() => {
@@ -77,7 +95,7 @@ export default function WhatsAppChatbot() {
 
   const openWhatsApp = () => {
     const text = encodeURIComponent('Bonjour, j\'ai une question concernant vos produits.');
-    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${text}`, '_blank');
+    window.open(`https://wa.me/${whatsappNumber}?text=${text}`, '_blank');
   };
 
   return (
@@ -101,7 +119,7 @@ export default function WhatsAppChatbot() {
                 <MessageCircle className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="font-semibold">UrbanStyle Support</h3>
+                <h3 className="font-semibold">{siteName} Support</h3>
                 <div className="flex items-center gap-1 text-xs text-white/80">
                   <span className={`w-2 h-2 rounded-full ${isBusinessHours ? 'bg-green-300' : 'bg-red-400'}`} />
                   {isBusinessHours ? 'En ligne' : 'Hors ligne'}
@@ -187,4 +205,3 @@ export default function WhatsAppChatbot() {
     </>
   );
 }
-

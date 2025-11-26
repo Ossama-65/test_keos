@@ -1,0 +1,194 @@
+{
+  "site": {
+    "name": "URBANSTYLE",
+    "tagline": "STYLE",
+    "description": "Votre destination mode pour des vêtements de qualité.",
+    "email": "contact@urbanstyle.fr",
+    "phone": "01 23 45 67 89",
+    "address": "123 Avenue de la Mode",
+    "city": "75001 Paris, France",
+    "whatsapp": "33123456789",
+    "copyright": "© 2024 UrbanStyle. Tous droits réservés."
+  },
+  "hero": {
+    "badge": "Nouvelle Collection 2024",
+    "title": "Style Urbain",
+    "titleAccent": "Qualité Premium",
+    "description": "Découvrez notre collection exclusive de t-shirts et jeans. Des pièces uniques pour un style qui vous ressemble.",
+    "ctaText": "Voir les Produits",
+    "ctaSecondary": "Nous Contacter",
+    "backgroundImage": "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1920&q=80"
+  },
+  "advantages": [
+    {
+      "id": "1",
+      "icon": "Truck",
+      "title": "Livraison Rapide",
+      "description": "Expédition sous 24-48h partout en France"
+    },
+    {
+      "id": "2",
+      "icon": "Shield",
+      "title": "Paiement Sécurisé",
+      "description": "Transactions 100% sécurisées"
+    },
+    {
+      "id": "3",
+      "icon": "RefreshCw",
+      "title": "Retours Gratuits",
+      "description": "30 jours pour changer d'avis"
+    }
+  ],
+  "bestsellers": {
+    "title": "Nos Bestsellers",
+    "description": "Les pièces préférées de nos clients, sélectionnées pour leur qualité et leur style.",
+    "products": ["1", "7", "2", "8"]
+  },
+  "products": [
+    {
+      "id": "1",
+      "name": "T-Shirt Premium Noir",
+      "price": 29.99,
+      "category": "tshirt",
+      "sizes": ["S", "M", "L", "XL"],
+      "image": "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&q=80",
+      "color": "Noir",
+      "active": true
+    },
+    {
+      "id": "2",
+      "name": "T-Shirt Blanc Essential",
+      "price": 24.99,
+      "category": "tshirt",
+      "sizes": ["S", "M", "L", "XL", "XXL"],
+      "image": "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=400&q=80",
+      "color": "Blanc",
+      "active": true
+    },
+    {
+      "id": "3",
+      "name": "T-Shirt Gris Chiné",
+      "price": 27.99,
+      "category": "tshirt",
+      "sizes": ["M", "L", "XL"],
+      "image": "https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=400&q=80",
+      "color": "Gris",
+      "active": true
+    },
+    {
+      "id": "4",
+      "name": "T-Shirt Navy Blue",
+      "price": 29.99,
+      "category": "tshirt",
+      "sizes": ["S", "M", "L"],
+      "image": "https://images.unsplash.com/photo-1562157873-818bc0726f68?w=400&q=80",
+      "color": "Bleu Marine",
+      "active": true
+    },
+    {
+      "id": "5",
+      "name": "T-Shirt Oversize Beige",
+      "price": 34.99,
+      "category": "tshirt",
+      "sizes": ["M", "L", "XL"],
+      "image": "https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=400&q=80",
+      "color": "Beige",
+      "active": true
+    },
+    {
+      "id": "6",
+      "name": "T-Shirt Col V Noir",
+      "price": 26.99,
+      "category": "tshirt",
+      "sizes": ["S", "M", "L", "XL"],
+      "image": "https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=400&q=80",
+      "color": "Noir",
+      "active": true
+    },
+    {
+      "id": "7",
+      "name": "Jean Slim Classic",
+      "price": 59.99,
+      "category": "jean",
+      "sizes": ["28", "30", "32", "34", "36"],
+      "image": "https://images.unsplash.com/photo-1542272604-787c3835535d?w=400&q=80",
+      "color": "Bleu Foncé",
+      "active": true
+    },
+    {
+      "id": "8",
+      "name": "Jean Regular Vintage",
+      "price": 69.99,
+      "category": "jean",
+      "sizes": ["30", "32", "34", "36"],
+      "image": "https://images.unsplash.com/photo-1604176354204-9268737828e4?w=400&q=80",
+      "color": "Bleu Délavé",
+      "active": true
+    },
+    {
+      "id": "9",
+      "name": "Jean Noir Stretch",
+      "price": 64.99,
+      "category": "jean",
+      "sizes": ["28", "30", "32", "34"],
+      "image": "https://images.unsplash.com/photo-1582552938357-32b906df40cb?w=400&q=80",
+      "color": "Noir",
+      "active": true
+    },
+    {
+      "id": "10",
+      "name": "Jean Droit Indigo",
+      "price": 74.99,
+      "category": "jean",
+      "sizes": ["30", "32", "34", "36", "38"],
+      "image": "https://images.unsplash.com/photo-1475178626620-a4d074967452?w=400&q=80",
+      "color": "Indigo",
+      "active": true
+    },
+    {
+      "id": "11",
+      "name": "Jean Skinny Gris",
+      "price": 54.99,
+      "category": "jean",
+      "sizes": ["28", "30", "32"],
+      "image": "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=400&q=80",
+      "color": "Gris",
+      "active": true
+    },
+    {
+      "id": "12",
+      "name": "Jean Baggy Light Blue",
+      "price": 79.99,
+      "category": "jean",
+      "sizes": ["30", "32", "34", "36"],
+      "image": "https://images.unsplash.com/photo-1598554747436-c9293d6a588f?w=400&q=80",
+      "color": "Bleu Clair",
+      "active": true
+    }
+  ],
+  "contact": {
+    "title": "Contactez-nous",
+    "subtitle": "Une question ? Besoin d'aide ? Notre équipe est là pour vous accompagner.",
+    "email": "contact@urbanstyle.fr",
+    "emailSupport": "support@urbanstyle.fr",
+    "phone": "01 23 45 67 89",
+    "phoneHours": "Du lundi au vendredi",
+    "hours": {
+      "weekdays": "Lundi - Vendredi : 9h00 - 18h00",
+      "saturday": "Samedi : 10h00 - 16h00",
+      "sunday": "Dimanche : Fermé"
+    },
+    "address": "123 Avenue de la Mode",
+    "city": "75001 Paris, France"
+  },
+  "productsPage": {
+    "title": "Nos Produits",
+    "description": "Découvrez notre collection de t-shirts et jeans de qualité premium."
+  },
+  "meta": {
+    "title": "UrbanStyle | T-Shirts & Jeans Premium Homme",
+    "description": "Découvrez notre collection de t-shirts et jeans pour homme. Qualité premium, livraison 24-48h, retours gratuits. Dès 24,99€.",
+    "keywords": "t-shirt homme, jean homme, vêtements homme, mode masculine, streetwear, urban style"
+  }
+}
+
